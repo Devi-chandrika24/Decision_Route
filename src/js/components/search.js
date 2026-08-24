@@ -308,3 +308,38 @@ function _placeIcon(type) {
   };
   return map[type] ?? map.default;
 }
+
+
+document.getElementById('gps-btn')?.addEventListener('click', () => {
+  const originInput = document.getElementById('origin-input');
+  if (navigator.geolocation) {
+    originInput.value = 'Locating...';
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(\https://nominatim.openstreetmap.org/reverse?lat=\&lon=\&format=json\);
+          const data = await res.json();
+          const placeName = data.display_name || \, \;
+          originInput.value = placeName;
+          
+          import('../state/store.js').then(({ dispatch }) => {
+            dispatch({
+              type: 'SET_ORIGIN',
+              payload: { lat: pos.coords.latitude, lon: pos.coords.longitude, name: placeName }
+            });
+            _checkReady();
+          });
+        } catch (e) {
+          originInput.value = '';
+          alert('Failed to get location name.');
+        }
+      },
+      () => {
+        originInput.value = '';
+        alert('Location access denied or failed.');
+      }
+    );
+  } else {
+    alert('Geolocation is not supported by your browser.');
+  }
+});
