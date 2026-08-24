@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="DecisionRoute — Compare route options by time, cost, and weather risk." />
+  <title>DecisionRoute · Make Every Journey Count</title>
+
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Phosphor Icons — professional 3D-styled icon set, free -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+
+  <meta name="theme-color" content="#7c6aff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+</head>
+<body>
+
+  <!-- OFFLINE BANNER -->
+  <div id="offline-banner" class="offline-banner" role="alert" aria-live="polite" hidden>
+    <i class="ph-bold ph-wifi-slash offline-banner__icon"></i>
+    <span class="offline-banner__text">You're offline — showing last saved results</span>
+    <button class="offline-banner__retry" id="retry-btn" type="button">Retry</button>
+  </div>
+
+  <!-- HEADER -->
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="brand">
+        <span class="brand__icon" aria-hidden="true">🧭</span>
+        <span class="brand__name">DecisionRoute</span>
+      </div>
+      <p class="brand__tagline">Don't just find a route — make the right call.</p>
+    </div>
+  </header>
+
+  <main class="app-main" id="app-main" role="main">
+    <div class="container">
+
+      <!-- SEARCH SECTION -->
+      <section class="search-section glass-card" aria-labelledby="search-heading">
+        <h2 id="search-heading" class="section-title">
+          <i class="ph-fill ph-map-pin section-icon" aria-hidden="true"></i>
+          Where are you headed?
+        </h2>
+
+        <form class="search-form" id="search-form" novalidate aria-label="Route search">
+
+          <!-- Row 1: From + swap + To -->
+          <div class="search-row">
+
+            <!-- From field -->
+            <div class="search-field" id="origin-field" role="combobox"
+                 aria-expanded="false" aria-haspopup="listbox"
+                 aria-owns="origin-suggestions" aria-controls="origin-suggestions">
+              <label for="origin-input" class="search-field__label">
+                <i class="ph-bold ph-traffic-cone" aria-hidden="true"></i> From
+              </label>
+              <div class="search-field__wrapper">
+                <input
+                  id="origin-input"
+                  class="search-field__input"
+                  type="search"
+                  placeholder="Starting point…"
+                  autocomplete="off"
+                  aria-autocomplete="list"
+                  aria-controls="origin-suggestions"
+                  aria-describedby="origin-hint"
+                />
+                <button class="search-field__clear" type="button" aria-label="Clear origin" hidden>
+                  <i class="ph-bold ph-x" aria-hidden="true"></i>
+                </button>
+              </div>
+              <span id="origin-hint" class="sr-only">Type a location name.</span>
+              <ul id="origin-suggestions" class="suggestions-list" role="listbox"
+                  aria-label="Origin suggestions" hidden></ul>
+            </div>
+
+            <!-- Swap -->
+            <button class="swap-btn" type="button" id="swap-btn"
+                    aria-label="Swap origin and destination">
+              <i class="ph-bold ph-arrows-left-right" aria-hidden="true"></i>
+            </button>
+
+            <!-- To field -->
+            <div class="search-field" id="dest-field" role="combobox"
+                 aria-expanded="false" aria-haspopup="listbox"
+                 aria-owns="dest-suggestions" aria-controls="dest-suggestions">
+              <label for="dest-input" class="search-field__label">
+                <i class="ph-bold ph-flag-checkered" aria-hidden="true"></i> To
+              </label>
+              <div class="search-field__wrapper">
+                <input
+                  id="dest-input"
+                  class="search-field__input"
+                  type="search"
+                  placeholder="Destination…"
+                  autocomplete="off"
+                  aria-autocomplete="list"
+                  aria-controls="dest-suggestions"
+                  aria-describedby="dest-hint"
+                />
+                <button class="search-field__clear" type="button" aria-label="Clear destination" hidden>
+                  <i class="ph-bold ph-x" aria-hidden="true"></i>
+                </button>
+              </div>
+              <span id="dest-hint" class="sr-only">Type a location name.</span>
+              <ul id="dest-suggestions" class="suggestions-list" role="listbox"
+                  aria-label="Destination suggestions" hidden></ul>
+            </div>
+
+          </div><!-- /.search-row -->
+
+          <!-- Row 2: Compare button full width -->
+          <button class="search-btn" type="submit" id="search-btn" disabled>
+            <i class="ph-fill ph-magnifying-glass search-btn__icon" aria-hidden="true"></i>
+            <span class="search-btn__text">Compare Routes</span>
+          </button>
+
+        </form>
+      </section>
+
+      <!-- PREFERENCES SECTION -->
+      <section class="prefs-section glass-card" aria-labelledby="prefs-heading">
+        <div class="prefs-header">
+          <h2 id="prefs-heading" class="section-title">
+            <i class="ph-fill ph-scales section-icon" aria-hidden="true"></i>
+            What matters most?
+          </h2>
+          <button class="advanced-toggle" type="button" id="advanced-toggle"
+                  aria-expanded="false" aria-controls="advanced-sliders">
+            Advanced <i class="ph-bold ph-caret-down advanced-toggle__chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="preset-group" role="group" aria-label="Route priority presets">
+          <button class="preset-btn preset-btn--active" type="button" data-preset="balanced" aria-pressed="true">
+            <i class="ph-fill ph-scales-fill" aria-hidden="true"></i> Balanced
+          </button>
+          <button class="preset-btn" type="button" data-preset="fastest" aria-pressed="false">
+            <i class="ph-fill ph-lightning" aria-hidden="true"></i> Fastest
+          </button>
+          <button class="preset-btn" type="button" data-preset="cheapest" aria-pressed="false">
+            <i class="ph-fill ph-currency-inr" aria-hidden="true"></i> Cheapest
+          </button>
+          <button class="preset-btn" type="button" data-preset="safest" aria-pressed="false">
+            <i class="ph-fill ph-shield-check" aria-hidden="true"></i> Safest
+          </button>
+        </div>
+
+        <div class="advanced-sliders" id="advanced-sliders" hidden>
+          <p class="sliders-hint">Adjust weights — they auto-balance to 100%.</p>
+          <div class="slider-row">
+            <label class="slider-label" for="weight-time">
+              <i class="ph-fill ph-clock" aria-hidden="true"></i> Time
+            </label>
+            <input class="weight-slider" id="weight-time" type="range"
+                   min="0" max="100" value="34"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="34" />
+            <output class="slider-output" for="weight-time" id="output-time">34%</output>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label" for="weight-cost">
+              <i class="ph-fill ph-currency-inr" aria-hidden="true"></i> Cost
+            </label>
+            <input class="weight-slider" id="weight-cost" type="range"
+                   min="0" max="100" value="33"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="33" />
+            <output class="slider-output" for="weight-cost" id="output-cost">33%</output>
+          </div>
+          <div class="slider-row">
+            <label class="slider-label" for="weight-risk">
+              <i class="ph-fill ph-cloud-rain" aria-hidden="true"></i> Risk
+            </label>
+            <input class="weight-slider" id="weight-risk" type="range"
+                   min="0" max="100" value="33"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="33" />
+            <output class="slider-output" for="weight-risk" id="output-risk">33%</output>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAP SECTION -->
+      <section class="map-section glass-card" id="map-section" aria-label="Route map" hidden>
+        <div class="map-header">
+          <h2 class="section-title map-section__title">
+            <i class="ph-fill ph-map-trifold section-icon" aria-hidden="true"></i> Route Map
+          </h2>
+          <div class="map-legend" aria-label="Map legend">
+            <span class="legend-dot" style="background:#7c6aff"></span>
+            <span class="legend-label">Recommended</span>
+            <span class="legend-dot" style="background:#4facde"></span>
+            <span class="legend-label">Alternate</span>
+          </div>
+        </div>
+        <div id="leaflet-map" class="leaflet-map-container" aria-label="Interactive route map"></div>
+      </section>
+
+      <!-- RESULTS SECTION -->
+      <section class="results-section" id="results-section"
+               aria-labelledby="results-heading" aria-live="polite">
+        <h2 id="results-heading" class="sr-only">Route Comparison Results</h2>
+
+        <!-- Empty state -->
+        <div class="state-empty" id="state-empty">
+          <div class="state-empty__icon-wrap" aria-hidden="true">
+            <i class="ph-duotone ph-map-trifold state-empty__big-icon"></i>
+          </div>
+          <h3 class="state-empty__title">Your journey starts here</h3>
+          <p class="state-empty__desc">
+            Enter an origin and destination to compare routes by time, cost, and weather risk.
+          </p>
+          <div class="motivational-chips" aria-hidden="true">
+            <span class="chip"><i class="ph-fill ph-clock"></i> Save time</span>
+            <span class="chip"><i class="ph-fill ph-currency-inr"></i> Save money</span>
+            <span class="chip"><i class="ph-fill ph-sun"></i> Stay safe</span>
+          </div>
+        </div>
+
+        <!-- Loading state -->
+        <div class="state-loading" id="state-loading" hidden aria-label="Loading route comparison">
+          <div class="skeleton-grid" aria-hidden="true">
+            <div class="skeleton-card">
+              <div class="skeleton-line skeleton-line--wide"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line skeleton-line--narrow"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-badge"></div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skeleton-line skeleton-line--wide"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line skeleton-line--narrow"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-badge"></div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skeleton-line skeleton-line--wide"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line skeleton-line--narrow"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-badge"></div>
+            </div>
+          </div>
+          <p class="loading-caption">
+            <i class="ph-bold ph-spinner-gap loading-spinner" aria-hidden="true"></i>
+            Analysing route options…
+          </p>
+        </div>
+
+        <!-- Error state -->
+        <div class="state-error" id="state-error" hidden role="alert">
+          <div class="state-error__icon-wrap">
+            <i class="ph-duotone ph-warning-circle state-error__big-icon" aria-hidden="true"></i>
+          </div>
+          <h3 class="state-error__title">Could not load routes</h3>
+          <p class="state-error__desc" id="error-message">An unexpected error occurred.</p>
+          <button class="btn-retry" type="button" id="error-retry-btn">
+            <i class="ph-bold ph-arrow-clockwise" aria-hidden="true"></i> Try again
+          </button>
+        </div>
+
+        <!-- No-route state -->
+        <div class="state-no-route" id="state-no-route" hidden role="status">
+          <i class="ph-duotone ph-road-horizon state-error__big-icon" aria-hidden="true"></i>
+          <h3>No drivable route found</h3>
+          <p>These locations may not be connected by road. Try nearby alternatives.</p>
+        </div>
+
+        <!-- Results -->
+        <div class="state-results" id="state-results" hidden>
+          <div class="partial-warning" id="partial-warning" hidden role="status">
+            <i class="ph-fill ph-cloud-slash" aria-hidden="true"></i>
+            Weather data unavailable — risk scores are estimated.
+          </div>
+
+          <!-- Share bar -->
+          <div class="share-bar" id="share-bar">
+            <button class="share-btn" id="share-btn" type="button" aria-label="Copy share link">
+              <i class="ph-bold ph-share-network" aria-hidden="true"></i> Share comparison
+            </button>
+            <span class="share-toast" id="share-toast" hidden aria-live="polite">
+              <i class="ph-fill ph-check-circle" aria-hidden="true"></i> Link copied!
+            </span>
+          </div>
+
+          <div class="route-grid" id="route-grid" role="list" aria-label="Route comparison"></div>
+
+          <aside class="recommendation-panel glass-card" id="recommendation-panel"
+                 aria-labelledby="rec-heading">
+            <h3 id="rec-heading" class="recommendation-panel__title">
+              <i class="ph-fill ph-trophy" aria-hidden="true"></i> Why we recommend this route
+            </h3>
+            <p class="recommendation-panel__text" id="recommendation-text"></p>
+            <div class="recommendation-panel__meta" id="recommendation-meta"></div>
+          </aside>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p class="footer-note">
+        Powered by
+        <a href="https://project-osrm.org/" target="_blank" rel="noopener">OSRM</a>,
+        <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>,
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> &amp;
+        <a href="https://leafletjs.com/" target="_blank" rel="noopener">Leaflet</a> — all free &amp; open-source.
+      </p>
+      <p class="footer-note footer-note--small">
+        Route times and costs are estimates. Always verify before travel.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- App -->
+  <script type="module" src="js/app.js"></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .catch(err => console.warn('[SW] Registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

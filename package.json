@@ -1,0 +1,17 @@
+{
+  "name": "decision-route",
+  "version": "1.0.0",
+  "description": "A vanilla-JS multi-option route decision engine — no framework, production-grade browser engineering.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/scoring.test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["routing", "decision-engine", "vanilla-js", "openrouteservice", "nominatim", "open-meteo"],
+  "license": "MIT"
+}

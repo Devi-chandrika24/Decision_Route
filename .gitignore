@@ -1,0 +1,12 @@
+# Local environment — contains secrets — NEVER commit
+.env
+
+# Node modules (if any dev tools are installed later)
+node_modules/
+
+# macOS metadata
+.DS_Store
+
+# Editor artifacts
+.vscode/
+*.code-workspace

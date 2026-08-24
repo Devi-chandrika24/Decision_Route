@@ -1,0 +1,123 @@
+/* ═══════════════════════════════════════════════════════════════
+   variables.css — Design tokens for DecisionRoute
+   Premium dark-first palette · No expensive filter:blur on bg
+════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand gradients ──────────────────────────────────────── */
+  --grad-bg        : linear-gradient(135deg, #080720 0%, #130f38 40%, #1a0f3c 70%, #0d1228 100%);
+  --grad-accent    : linear-gradient(135deg, #7c6aff 0%, #4facde 50%, #b088ff 100%);
+  --grad-card      : linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  --grad-recommended: linear-gradient(135deg, rgba(52,211,153,0.15) 0%, rgba(16,185,129,0.05) 100%);
+
+  /* ── Glassmorphism tokens ────────────────────────────────── */
+  --glass-bg        : rgba(255, 255, 255, 0.055);
+  --glass-bg-hover  : rgba(255, 255, 255, 0.09);
+  --glass-border    : rgba(255, 255, 255, 0.12);
+  --glass-border-hi : rgba(255, 255, 255, 0.22);
+  --glass-shadow    : 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  --glass-blur      : blur(16px);
+  --glass-blur-sm   : blur(8px);
+
+  /* ── Colour system ───────────────────────────────────────── */
+  --color-primary   : #7c6aff;
+  --color-primary-hi: #9d8fff;
+  --color-secondary : #4facde;
+  --color-accent    : #b088ff;
+  --color-success   : #34d399;
+  --color-warning   : #fbbf24;
+  --color-danger    : #f87171;
+  --color-info      : #60a5fa;
+
+  /* ── Text ────────────────────────────────────────────────── */
+  --text-primary    : rgba(255, 255, 255, 0.96);
+  --text-secondary  : rgba(255, 255, 255, 0.60);
+  --text-tertiary   : rgba(255, 255, 255, 0.35);
+  --text-on-accent  : #ffffff;
+
+  /* ── Spacing (4-point grid) ─────────────────────────────── */
+  --sp-1  : 0.25rem;
+  --sp-2  : 0.5rem;
+  --sp-3  : 0.75rem;
+  --sp-4  : 1rem;
+  --sp-5  : 1.25rem;
+  --sp-6  : 1.5rem;
+  --sp-8  : 2rem;
+  --sp-10 : 2.5rem;
+  --sp-12 : 3rem;
+  --sp-16 : 4rem;
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-sans   : 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono   : 'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-xs   : 0.75rem;
+  --text-sm   : 0.875rem;
+  --text-base : 1rem;
+  --text-lg   : 1.125rem;
+  --text-xl   : 1.25rem;
+  --text-2xl  : 1.5rem;
+  --text-3xl  : 1.875rem;
+  --text-4xl  : 2.25rem;
+  --text-5xl  : 3rem;
+
+  --weight-light    : 300;
+  --weight-regular  : 400;
+  --weight-medium   : 500;
+  --weight-semibold : 600;
+  --weight-bold     : 700;
+  --weight-extrabold: 800;
+
+  --line-tight  : 1.2;
+  --line-normal : 1.5;
+  --line-relaxed: 1.65;
+
+  /* ── Border radii ────────────────────────────────────────── */
+  --radius-sm   : 0.375rem;
+  --radius-md   : 0.75rem;
+  --radius-lg   : 1rem;
+  --radius-xl   : 1.25rem;
+  --radius-2xl  : 1.75rem;
+  --radius-full : 9999px;
+
+  /* ── Transitions ─────────────────────────────────────────── */
+  --transition-fast   : 150ms ease;
+  --transition-normal : 250ms ease;
+  --transition-slow   : 400ms ease;
+  --transition-spring : 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-index layers ──────────────────────────────────────── */
+  --z-base    : 0;
+  --z-raised  : 10;
+  --z-dropdown: 500;
+  --z-sticky  : 600;
+  --z-overlay : 700;
+  --z-toast   : 800;
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-sm  : 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md  : 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg  : 0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-xl  : 0 20px 60px rgba(0, 0, 0, 0.7);
+  --shadow-glow-primary : 0 0 30px rgba(124, 106, 255, 0.45);
+  --shadow-glow-success : 0 0 24px rgba(52, 211, 153, 0.4);
+  --shadow-card-3d      : 0 20px 60px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+
+  /* ── Skeleton ────────────────────────────────────────────── */
+  --skeleton-from : rgba(255, 255, 255, 0.04);
+  --skeleton-to   : rgba(255, 255, 255, 0.10);
+  --skeleton-dur  : 1.6s;
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  --container-max : 1160px;
+  --container-pad : clamp(var(--sp-4), 4vw, var(--sp-8));
+}
+
+/* ── Reduced-motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration      : 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration     : 0.01ms !important;
+  }
+}

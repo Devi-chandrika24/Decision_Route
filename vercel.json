@@ -1,0 +1,43 @@
+{
+  "version": 2,
+  "buildCommand": null,
+  "outputDirectory": "src",
+  "functions": {
+    "api/route.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/route",
+      "dest": "/api/route.js"
+    },
+    {
+      "src": "/sw.js",
+      "headers": { "Cache-Control": "no-cache, no-store, must-revalidate" },
+      "dest": "/sw.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Service-Worker-Allowed", "value": "/" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    }
+  ]
+}
