@@ -47,6 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
   syncPresetsToStore();  // keeps preset highlight in sync
   initMap();             // registers map section element
 
+  // Register Service Worker for PWA support
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => {
+        console.warn('Service worker registration failed:', err);
+      });
+    });
+  }
+
   // Wire search confirmation to routing flow
   onLocationsReady(_handleSearch);
 
