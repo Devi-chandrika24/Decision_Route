@@ -13,5 +13,5 @@
     "node": ">=18.0.0"
   },
   "keywords": ["routing", "decision-engine", "vanilla-js", "openrouteservice", "nominatim", "open-meteo"],
-  "license": "MIT"
+  "license": "MIT" 
 }
