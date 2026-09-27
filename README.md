@@ -15,9 +15,7 @@
 **Decision Route** is an intelligent, open-source web application that goes beyond simple directions. It allows users to compare up to three route alternatives side-by-side using a smart scoring algorithm. By taking into account user-defined preferences (duration vs. distance) and real-time weather risks, it highlights the **optimal route** to take.
 
 Built completely with **Vanilla JavaScript (ES6+), HTML5, and CSS3** (No heavy frontend frameworks), it is blazing fast and lightweight.
-
 ---
-
 ## ✨ Features
 * 🚦 **Multi-Route Comparison:** Compares up to 3 routes side-by-side.
 * ⚖️ **Dynamic Scoring Engine:** Balances time, distance, and user preferences to dynamically calculate the best recommendation.
